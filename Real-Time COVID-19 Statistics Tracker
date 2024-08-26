@@ -1,0 +1,58 @@
+def fetch_covid_data(region):
+    # Determine the endpoint based on whether the region is a country or city
+    endpoint = f"{API_URL}/countries/{region}" if len(region) > 2 and region.isalpha() else f"{API_URL}/cities/{region}"
+    print(f"Requesting data from URL: {endpoint}")  # Debug: print the URL being requested
+    
+    try:
+        response = requests.get(endpoint)
+        response.raise_for_status()  # Raises an HTTPError for bad responses
+        print(f"Response status code: {response.status_code}")  # Debug: print status code
+        
+        # Attempt to parse the JSON response
+        data = response.json()
+        print(f"Parsed response data: {data}")  # Debug: print parsed JSON data
+        
+        # Handle country data response
+        if 'cases' in data and 'deaths' in data and 'recovered' in data:
+            return {
+                'cases': data['cases'],
+                'deaths': data['deaths'],
+                'recovered': data['recovered']
+            }
+        
+        # Handle city data response if available
+        if 'cases' in data['data'] and 'deaths' in data['data'] and 'recovered' in data['data']:
+            return {
+                'cases': data['data']['cases'],
+                'deaths': data['data']['deaths'],
+                'recovered': data['data']['recovered']
+            }
+        
+        # Handle unexpected data format
+        return {'error': 'Data format error or no data found'}
+    
+    except requests.HTTPError as e:
+        return {'error': f"HTTPError: {e.response.status_code} - {e.response.reason}"}
+    except requests.RequestException as e:
+        return {'error': f"RequestException: {e}"}
+    except Exception as e:
+        return {'error': f"Unexpected error: {e}"}
+
+def main():
+    region = input("Enter the region (country, state, or city): ").strip()
+    print(f"User entered region: {region}")  # Debug: print the region entered by the user
+    
+    # Fetch COVID-19 data for the specified region
+    covid_data = fetch_covid_data(region)
+    
+    # Display results
+    if 'error' in covid_data:
+        print(f"Error fetching data: {covid_data['error']}")
+    else:
+        print(f"COVID-19 Statistics for {region.capitalize()}:")
+        print(f"Total Cases: {covid_data['cases']}")
+        print(f"Total Deaths: {covid_data['deaths']}")
+        print(f"Total Recovered: {covid_data['recovered']}")
+
+if _name_ == "_main_":
+    main()
