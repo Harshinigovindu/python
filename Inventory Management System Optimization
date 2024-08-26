@@ -1,0 +1,49 @@
+import pandas as pd
+
+# Sample data
+products = pd.DataFrame({
+    'ProductID': [1, 2, 3],
+    'Name': ['Widget', 'Gadget', 'Doodad'],
+    'Description': ['A useful widget', 'A fancy gadget', 'An interesting doodad'],
+    'Price': [10.0, 15.0, 5.0]
+})
+
+warehouses = pd.DataFrame({
+    'WarehouseID': [1, 2],
+    'Location': ['New York', 'Los Angeles'],
+    'Capacity': [1000, 1500]
+})
+
+stock_levels = pd.DataFrame({
+    'ProductID': [1, 1, 2, 3],
+    'WarehouseID': [1, 2, 1, 2],
+    'Quantity': [50, 70, 20, 100]
+})
+
+reorder_thresholds = pd.DataFrame({
+    'ProductID': [1, 2, 3],
+    'Threshold': [30, 15, 10]
+})
+
+def check_stock_levels():
+    """Check inventory levels and alert if stock is below threshold."""
+    alerts = []
+    for _, row in reorder_thresholds.iterrows():
+        product_id = row['ProductID']
+        threshold = row['Threshold']
+        current_stock = stock_levels[stock_levels['ProductID'] == product_id]['Quantity'].sum()
+        if current_stock < threshold:
+            product_name = products[products['ProductID'] == product_id]['Name'].values[0]
+            alerts.append(f"Alert: {product_name} (ID {product_id}) is below threshold. Current stock: {current_stock}")
+    return alerts
+
+def main():
+    alerts = check_stock_levels()
+    if alerts:
+        for alert in alerts:
+            print(alert)
+    else:
+        print("All stock levels are above the threshold.")
+
+if _name_ == "_main_":
+    main()
