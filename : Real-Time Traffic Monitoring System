@@ -1,0 +1,32 @@
+def main():
+    # Prompt user for starting point and destination
+    start_point = input("Enter the starting point: ")
+    end_point = input("Enter the destination: ")
+
+    # Print user inputs for debugging
+    print(f"Start point: {start_point}")
+    print(f"End point: {end_point}")
+
+    try:
+        # Fetch traffic data using the provided start and end points
+        traffic_data = get_traffic_data(start_point, end_point)
+        
+        # Print the fetched traffic data for debugging
+        print(f"Traffic data received: {traffic_data}")
+
+        # Check if there was an error with the API request
+        if 'error' in traffic_data:
+            print(f"Error fetching data: {traffic_data['error']}")
+        else:
+            # Print the results if no error occurred
+            print(f"Estimated travel time: {traffic_data['travel_time']}")
+            print(f"Estimated travel time with traffic: {traffic_data['traffic_time']}")
+            print(f"Distance: {traffic_data['distance']}")
+            print("Incidents:")
+            for incident in traffic_data['incidents']:
+                print(f"- {incident}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+if _name_ == "_main_":
+    main()
